@@ -15,7 +15,6 @@ type Recipe = {
   steps: string[];
 };
 
-// 🔥 DUŻA BAZA PRZEPISÓW (24 Przepisy)
 const RECIPES: Recipe[] = [
   // --- REDUKCJA ---
   {
@@ -147,10 +146,7 @@ const RECIPES: Recipe[] = [
 export default function Home() {
   const [tab, setTab] = useState<'journal' | 'recipes'>('journal');
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-  
-  // 🔥 NOWY STAN DLA FILTRA PRZEPISÓW
   const [filter, setFilter] = useState<'ALL' | 'REDUKCJA' | 'MASA' | 'UTRZYMANIE'>('ALL');
-
   const [foodInput, setFoodInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [meals, setMeals] = useState<Meal[]>([]);
@@ -200,63 +196,71 @@ export default function Home() {
 
   const current = meals.reduce((acc, m) => ({ kcal: acc.kcal + m.kcal, p: acc.p + m.protein, c: acc.c + m.carbs, f: acc.f + m.fat }), { kcal: 0, p: 0, c: 0, f: 0 });
 
-  // 🔥 Logika filtrowania
   const filteredRecipes = filter === 'ALL' ? RECIPES : RECIPES.filter(r => r.tag === filter);
 
   return (
-    <main className="min-h-screen bg-[#f8fafc] p-4 md:p-8 text-slate-900 pb-20">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <main className="min-h-screen bg-[#f8fafc] p-4 md:p-8 text-slate-900 pb-24">
+      <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
         
         {/* HEADER & NAV */}
-        <header className="flex flex-col items-center relative">
-          <h1 className="text-6xl font-black text-indigo-600 italic tracking-tighter">FATATU</h1>
+        <header className="flex flex-col items-center relative mt-4 md:mt-0">
+          <h1 className="text-5xl md:text-6xl font-black text-indigo-600 italic tracking-tighter">FATATU</h1>
           <nav className="flex gap-2 mt-4 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100">
-            <button onClick={() => {setTab('journal'); setSelectedRecipe(null);}} className={`px-8 py-2.5 rounded-xl font-black transition-all ${tab === 'journal' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-indigo-500'}`}>DZIENNIK</button>
-            <button onClick={() => setTab('recipes')} className={`px-8 py-2.5 rounded-xl font-black transition-all ${tab === 'recipes' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-indigo-500'}`}>PRZEPISY ⚡</button>
+            <button onClick={() => {setTab('journal'); setSelectedRecipe(null);}} className={`px-4 md:px-8 py-2 md:py-2.5 rounded-xl font-black text-sm md:text-base transition-all ${tab === 'journal' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-indigo-500'}`}>DZIENNIK</button>
+            <button onClick={() => setTab('recipes')} className={`px-4 md:px-8 py-2 md:py-2.5 rounded-xl font-black text-sm md:text-base transition-all ${tab === 'recipes' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-indigo-500'}`}>PRZEPISY ⚡</button>
           </nav>
-          <button onClick={() => setShowSettings(!showSettings)} className="absolute right-0 top-2 font-bold text-xs bg-white text-slate-400 px-3 py-1.5 rounded-full border border-slate-100 shadow-sm hover:bg-slate-50 transition-colors">⚙️ PROFIL</button>
+          <button onClick={() => setShowSettings(!showSettings)} className="absolute right-0 top-0 md:top-2 font-bold text-[10px] md:text-xs bg-white text-slate-400 px-3 py-1.5 rounded-full border border-slate-100 shadow-sm hover:bg-slate-50 transition-colors">⚙️ PROFIL</button>
         </header>
 
         {/* SETTINGS MODAL */}
         {showSettings && (
-          <form onSubmit={calculateLocalGoals} className="bg-white p-6 rounded-[2.5rem] shadow-2xl border-2 border-indigo-100 grid grid-cols-2 md:grid-cols-5 gap-4 animate-in zoom-in-95 duration-200">
-            <div className="col-span-5 flex justify-between items-center"><h3 className="font-black uppercase text-xs text-indigo-400">Twoje dane fizyczne</h3></div>
-            <input type="number" placeholder="Wiek" value={profile.age} onChange={e => setProfile({...profile, age: e.target.value})} className="bg-slate-50 p-3 rounded-2xl border border-slate-100 focus:border-indigo-500 outline-none" />
-            <input type="number" placeholder="Waga kg" value={profile.weight} onChange={e => setProfile({...profile, weight: e.target.value})} className="bg-slate-50 p-3 rounded-2xl border border-slate-100 focus:border-indigo-500 outline-none" />
-            <input type="number" placeholder="Wzrost cm" value={profile.height} onChange={e => setProfile({...profile, height: e.target.value})} className="bg-slate-50 p-3 rounded-2xl border border-slate-100 focus:border-indigo-500 outline-none" />
-            <select value={profile.activity} onChange={e => setProfile({...profile, activity: e.target.value})} className="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-xs col-span-2">
+          <form onSubmit={calculateLocalGoals} className="bg-white p-6 rounded-[2rem] shadow-2xl border-2 border-indigo-100 grid grid-cols-1 md:grid-cols-5 gap-4 animate-in zoom-in-95 duration-200">
+            <div className="col-span-1 md:col-span-5 flex justify-between items-center"><h3 className="font-black uppercase text-xs text-indigo-400">Twoje dane fizyczne</h3></div>
+            <input type="number" placeholder="Wiek" value={profile.age} onChange={e => setProfile({...profile, age: e.target.value})} className="bg-slate-50 p-3 rounded-xl border border-slate-100 focus:border-indigo-500 outline-none w-full" />
+            <input type="number" placeholder="Waga kg" value={profile.weight} onChange={e => setProfile({...profile, weight: e.target.value})} className="bg-slate-50 p-3 rounded-xl border border-slate-100 focus:border-indigo-500 outline-none w-full" />
+            <input type="number" placeholder="Wzrost cm" value={profile.height} onChange={e => setProfile({...profile, height: e.target.value})} className="bg-slate-50 p-3 rounded-xl border border-slate-100 focus:border-indigo-500 outline-none w-full" />
+            <select value={profile.activity} onChange={e => setProfile({...profile, activity: e.target.value})} className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs w-full col-span-1 md:col-span-2">
               <option>Siedzący tryb życia</option><option>Lekka (1-3 treningi)</option><option>Średnia (3-5 treningów)</option><option>Bardzo wysoka</option>
             </select>
-            <button type="submit" className="col-span-5 bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-indigo-700 transition-all">ZAPISZ I OBLICZ CELE 🚀</button>
+            <button type="submit" className="col-span-1 md:col-span-5 bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-all">ZAPISZ I OBLICZ CELE 🚀</button>
           </form>
         )}
 
         {tab === 'journal' ? (
           /* JOURNAL VIEW */
           <div className="space-y-6 animate-in fade-in duration-500">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* STAT CARDS */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
               <StatCard title="Kalorie" cur={current.kcal} max={goal.kcal} unit="kcal" col="bg-indigo-500" />
               <StatCard title="Białko" cur={current.p} max={goal.protein} unit="g" col="bg-rose-500" />
               <StatCard title="Węgle" cur={current.c} max={goal.carbs} unit="g" col="bg-amber-500" />
               <StatCard title="Tłuszcze" cur={current.f} max={goal.fat} unit="g" col="bg-emerald-500" />
             </div>
-            <form onSubmit={handleAddFood} className="bg-white p-2 rounded-3xl shadow-xl border border-indigo-50 flex gap-2">
-              <input type="text" value={foodInput} onChange={(e) => setFoodInput(e.target.value)} placeholder="Co dzisiaj jemy? (np. 3 jajka i awokado)" className="flex-1 px-6 py-4 rounded-2xl bg-transparent focus:outline-none text-lg" disabled={isLoading} />
-              <button disabled={isLoading} className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-100">{isLoading ? 'ANALIZA...' : 'DODAJ'}</button>
+            
+            {/* ADD FOOD FORM */}
+            <form onSubmit={handleAddFood} className="bg-white p-2 rounded-3xl shadow-xl border border-indigo-50 flex flex-col md:flex-row gap-2">
+              <input type="text" value={foodInput} onChange={(e) => setFoodInput(e.target.value)} placeholder="Co dzisiaj jemy?" className="flex-1 px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-transparent focus:outline-none text-base md:text-lg" disabled={isLoading} />
+              <button disabled={isLoading} className="px-6 md:px-10 py-3 md:py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-100">{isLoading ? 'ANALIZA...' : 'DODAJ'}</button>
             </form>
+
+            {/* HISTORY LIST */}
             <div className="space-y-4">
-              <h2 className="text-2xl font-black text-slate-800">Historia dnia</h2>
+              <h2 className="text-xl md:text-2xl font-black text-slate-800">Historia dnia</h2>
               {meals.map(m => (
-                <div key={m.id} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex justify-between items-center group hover:border-indigo-100 transition-all">
-                  <div>
-                    <div className="font-black text-xl capitalize text-slate-800">{m.name}</div>
-                    <div className="flex gap-4 text-sm font-bold mt-1">
-                      <span className="text-indigo-500">{m.kcal} kcal</span><span className="text-rose-400">B: {m.protein}g</span><span className="text-amber-400">W: {m.carbs}g</span><span className="text-emerald-400">T: {m.fat}g</span>
+                <div key={m.id} className="relative bg-white p-5 md:p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group hover:border-indigo-100 transition-all">
+                  <div className="w-full pr-10 md:pr-0">
+                    <div className="font-black text-lg md:text-xl capitalize text-slate-800 leading-tight">{m.name}</div>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs md:text-sm font-bold mt-2">
+                      <span className="text-indigo-500">{m.kcal} kcal</span>
+                      <span className="text-rose-400">B: {m.protein}g</span>
+                      <span className="text-amber-400">W: {m.carbs}g</span>
+                      <span className="text-emerald-400">T: {m.fat}g</span>
                     </div>
                   </div>
-                  <button onClick={async () => { await supabase.from('meals').delete().eq('id', m.id); fetchMeals(); }} className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all">✕</button>
+                  <button onClick={async () => { await supabase.from('meals').delete().eq('id', m.id); fetchMeals(); }} className="absolute top-4 right-4 md:static md:flex-shrink-0 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all">✕</button>
                 </div>
               ))}
+              {meals.length === 0 && <p className="text-slate-400 text-sm font-medium">Twój dziennik jest jeszcze pusty.</p>}
             </div>
           </div>
         ) : (
@@ -264,79 +268,76 @@ export default function Home() {
           <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
             {!selectedRecipe ? (
               <>
-                {/* 🔥 FILTRY KATEGORII */}
-                <div className="flex gap-3 overflow-x-auto pb-4 mb-2 scrollbar-hide">
-                  <button onClick={() => setFilter('ALL')} className={`px-5 py-2.5 rounded-full font-black text-xs transition-all whitespace-nowrap ${filter === 'ALL' ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'}`}>Wszystkie przepisy</button>
-                  <button onClick={() => setFilter('REDUKCJA')} className={`px-5 py-2.5 rounded-full font-black text-xs transition-all whitespace-nowrap flex items-center gap-2 ${filter === 'REDUKCJA' ? 'bg-rose-100 text-rose-600 shadow-sm border border-rose-200' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'}`}>🔥 Redukcja</button>
-                  <button onClick={() => setFilter('MASA')} className={`px-5 py-2.5 rounded-full font-black text-xs transition-all whitespace-nowrap flex items-center gap-2 ${filter === 'MASA' ? 'bg-indigo-100 text-indigo-600 shadow-sm border border-indigo-200' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'}`}>💪 Budowa Masy</button>
-                  <button onClick={() => setFilter('UTRZYMANIE')} className={`px-5 py-2.5 rounded-full font-black text-xs transition-all whitespace-nowrap flex items-center gap-2 ${filter === 'UTRZYMANIE' ? 'bg-emerald-100 text-emerald-600 shadow-sm border border-emerald-200' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'}`}>⚖️ Utrzymanie</button>
+                <div className="flex gap-2 overflow-x-auto pb-4 mb-2 scrollbar-hide">
+                  <button onClick={() => setFilter('ALL')} className={`px-4 py-2 rounded-full font-black text-[10px] md:text-xs transition-all whitespace-nowrap ${filter === 'ALL' ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'}`}>Wszystkie</button>
+                  <button onClick={() => setFilter('REDUKCJA')} className={`px-4 py-2 rounded-full font-black text-[10px] md:text-xs transition-all whitespace-nowrap flex items-center gap-1.5 ${filter === 'REDUKCJA' ? 'bg-rose-100 text-rose-600 shadow-sm border border-rose-200' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'}`}>🔥 Redukcja</button>
+                  <button onClick={() => setFilter('MASA')} className={`px-4 py-2 rounded-full font-black text-[10px] md:text-xs transition-all whitespace-nowrap flex items-center gap-1.5 ${filter === 'MASA' ? 'bg-indigo-100 text-indigo-600 shadow-sm border border-indigo-200' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'}`}>💪 Masa</button>
+                  <button onClick={() => setFilter('UTRZYMANIE')} className={`px-4 py-2 rounded-full font-black text-[10px] md:text-xs transition-all whitespace-nowrap flex items-center gap-1.5 ${filter === 'UTRZYMANIE' ? 'bg-emerald-100 text-emerald-600 shadow-sm border border-emerald-200' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'}`}>⚖️ Utrzymanie</button>
                 </div>
 
-                {/* GRID LIST */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 pb-10">
                   {filteredRecipes.map((r, i) => (
-                    <div key={i} onClick={() => setSelectedRecipe(r)} className="bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer group">
-                      <div className="p-8 space-y-4">
+                    <div key={i} onClick={() => setSelectedRecipe(r)} className="bg-white rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group">
+                      <div className="p-6 md:p-8 space-y-4">
                         <div className="flex justify-between items-center">
-                          <span className={`px-4 py-1 rounded-full text-[10px] font-black tracking-widest ${r.tag === 'REDUKCJA' ? 'bg-rose-100 text-rose-600' : r.tag === 'MASA' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                          <span className={`px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black tracking-widest ${r.tag === 'REDUKCJA' ? 'bg-rose-100 text-rose-600' : r.tag === 'MASA' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600'}`}>
                             {r.tag}
                           </span>
-                          <span className="text-slate-300 font-bold text-xs uppercase">{r.time}</span>
+                          <span className="text-slate-300 font-bold text-[10px] md:text-xs uppercase">{r.time}</span>
                         </div>
-                        <h3 className="text-2xl font-black text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors">{r.title}</h3>
-                        <div className="flex gap-3 text-[11px] font-bold">
+                        <h3 className="text-xl md:text-2xl font-black text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors">{r.title}</h3>
+                        <div className="flex flex-wrap gap-2 text-[10px] md:text-[11px] font-bold">
                           <span className="bg-slate-50 px-3 py-1 rounded-lg text-slate-500">{r.kcal} kcal</span>
                           <span className="bg-rose-50 px-3 py-1 rounded-lg text-rose-500">B: {r.p}g</span>
                         </div>
-                        <p className="text-slate-400 text-sm font-medium">Kliknij, aby zobaczyć tutorial i składniki →</p>
+                        <p className="text-slate-400 text-xs md:text-sm font-medium">Kliknij, aby zobaczyć przepis →</p>
                       </div>
                     </div>
                   ))}
-                  {filteredRecipes.length === 0 && (
-                     <div className="col-span-2 text-center text-slate-400 font-bold py-10">Brak przepisów w tej kategorii.</div>
-                  )}
                 </div>
               </>
             ) : (
               /* DETAILED VIEW */
-              <div className="bg-white rounded-[3rem] shadow-2xl border border-indigo-50 overflow-hidden animate-in zoom-in-95 duration-300">
-                <div className="p-8 md:p-12 space-y-8">
-                  <button onClick={() => setSelectedRecipe(null)} className="text-indigo-600 font-black flex items-center gap-2 hover:gap-4 transition-all uppercase text-sm tracking-widest">
-                    ← Powrót do listy
+              <div className="bg-white rounded-[2rem] md:rounded-[3rem] shadow-2xl border border-indigo-50 overflow-hidden animate-in zoom-in-95 duration-300">
+                <div className="p-6 md:p-12 space-y-6 md:space-y-8">
+                  <button onClick={() => setSelectedRecipe(null)} className="text-indigo-600 font-black flex items-center gap-2 hover:gap-4 transition-all uppercase text-xs md:text-sm tracking-widest">
+                    ← Powrót
                   </button>
                   
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <span className="px-4 py-1 bg-indigo-600 text-white rounded-full text-[10px] font-black tracking-widest uppercase">{selectedRecipe.tag}</span>
-                      <span className="text-slate-400 font-bold text-sm uppercase">Czas: {selectedRecipe.time}</span>
+                  <div className="space-y-3 md:space-y-4">
+                    <div className="flex items-center gap-3">
+                      <span className="px-3 py-1 bg-indigo-600 text-white rounded-full text-[9px] md:text-[10px] font-black tracking-widest uppercase">{selectedRecipe.tag}</span>
+                      <span className="text-slate-400 font-bold text-xs md:text-sm uppercase">Czas: {selectedRecipe.time}</span>
                     </div>
-                    <h2 className="text-5xl font-black text-slate-800 italic tracking-tighter">{selectedRecipe.title}</h2>
-                    <div className="flex gap-6 py-6 border-y border-slate-50">
-                      <div className="text-center"><div className="text-2xl font-black text-indigo-600">{selectedRecipe.kcal}</div><div className="text-[10px] font-bold text-slate-400 uppercase">kcal</div></div>
-                      <div className="text-center"><div className="text-2xl font-black text-rose-500">{selectedRecipe.p}g</div><div className="text-[10px] font-bold text-slate-400 uppercase">Białko</div></div>
-                      <div className="text-center"><div className="text-2xl font-black text-amber-500">{selectedRecipe.c}g</div><div className="text-[10px] font-bold text-slate-400 uppercase">Węgle</div></div>
-                      <div className="text-center"><div className="text-2xl font-black text-emerald-500">{selectedRecipe.f}g</div><div className="text-[10px] font-bold text-slate-400 uppercase">Tłuszcz</div></div>
+                    <h2 className="text-3xl md:text-5xl font-black text-slate-800 italic tracking-tighter leading-tight">{selectedRecipe.title}</h2>
+                    
+                    {/* MACROS GRID REBUILT FOR MOBILE */}
+                    <div className="grid grid-cols-2 md:flex md:gap-6 gap-4 py-4 md:py-6 border-y border-slate-50">
+                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-indigo-600">{selectedRecipe.kcal}</div><div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase">kcal</div></div>
+                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-rose-500">{selectedRecipe.p}g</div><div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase">Białko</div></div>
+                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-amber-500">{selectedRecipe.c}g</div><div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase">Węgle</div></div>
+                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-emerald-500">{selectedRecipe.f}g</div><div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase">Tłuszcz</div></div>
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-12">
-                    <div className="space-y-6">
-                      <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">🛒 Składniki</h3>
-                      <ul className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                    <div className="space-y-4 md:space-y-6">
+                      <h3 className="text-lg md:text-xl font-black text-slate-800 uppercase tracking-tight">🛒 Składniki</h3>
+                      <ul className="space-y-2 md:space-y-3">
                         {selectedRecipe.ingredients.map((ing, i) => (
-                          <li key={i} className="flex items-center gap-3 font-bold text-slate-600 bg-slate-50 p-3 rounded-2xl">
-                            <span className="w-2 h-2 bg-indigo-400 rounded-full"></span> {ing}
+                          <li key={i} className="flex items-center gap-3 font-bold text-slate-600 bg-slate-50 p-3 rounded-xl text-sm md:text-base">
+                            <span className="w-2 h-2 bg-indigo-400 rounded-full flex-shrink-0"></span> {ing}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <div className="space-y-6">
-                      <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">👨‍🍳 Tutorial</h3>
-                      <ol className="space-y-6">
+                    <div className="space-y-4 md:space-y-6">
+                      <h3 className="text-lg md:text-xl font-black text-slate-800 uppercase tracking-tight">👨‍🍳 Tutorial</h3>
+                      <ol className="space-y-4 md:space-y-6">
                         {selectedRecipe.steps.map((step, i) => (
-                          <li key={i} className="flex gap-4">
-                            <span className="flex-shrink-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center font-black text-sm">{i+1}</span>
-                            <p className="text-slate-600 font-medium leading-relaxed">{step}</p>
+                          <li key={i} className="flex gap-3 md:gap-4">
+                            <span className="flex-shrink-0 w-6 h-6 md:w-8 md:h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center font-black text-xs md:text-sm">{i+1}</span>
+                            <p className="text-slate-600 font-medium leading-relaxed text-sm md:text-base pt-0.5">{step}</p>
                           </li>
                         ))}
                       </ol>
@@ -345,9 +346,9 @@ export default function Home() {
 
                   <button 
                     onClick={() => { setFoodInput(selectedRecipe.title); setTab('journal'); setSelectedRecipe(null); }}
-                    className="w-full py-6 bg-indigo-600 text-white rounded-[2rem] font-black text-xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 hover:scale-[1.02] transition-all"
+                    className="w-full py-4 md:py-6 bg-indigo-600 text-white rounded-2xl md:rounded-[2rem] font-black text-base md:text-xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all"
                   >
-                    DODAJ TEN POSIŁEK DO DZIENNIKA ✨
+                    DODAJ DO DZIENNIKA ✨
                   </button>
                 </div>
               </div>
@@ -362,13 +363,18 @@ export default function Home() {
 function StatCard({ title, cur, max, unit, col }: any) {
   const prc = Math.min((cur / max) * 100, 100);
   return (
-    <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-      <div className="text-[10px] font-black text-slate-400 uppercase mb-1">{title}</div>
-      <div className="flex items-baseline gap-1"><span className="text-3xl font-black">{cur}</span><span className="text-xs font-bold text-slate-400">{unit}</span></div>
-      <div className="w-full bg-slate-100 h-2.5 rounded-full mt-4 overflow-hidden">
-        <div className={`h-full ${col} transition-all duration-1000`} style={{ width: `${prc}%` }} />
+    <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-between">
+      <div className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1">{title}</div>
+      <div className="flex items-baseline gap-1 break-all">
+        <span className="text-2xl md:text-3xl font-black text-slate-800">{cur}</span>
+        <span className="text-[10px] md:text-xs font-bold text-slate-400">{unit}</span>
       </div>
-      <div className="text-[10px] font-bold text-slate-300 mt-2 text-right">CEL: {max}</div>
+      <div>
+        <div className="w-full bg-slate-100 h-2 md:h-2.5 rounded-full mt-3 md:mt-4 overflow-hidden">
+          <div className={`h-full ${col} transition-all duration-1000`} style={{ width: `${prc}%` }} />
+        </div>
+        <div className="text-[9px] md:text-[10px] font-bold text-slate-300 mt-2 text-right">CEL: {max}</div>
+      </div>
     </div>
   );
 }
