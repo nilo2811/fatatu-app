@@ -55,8 +55,16 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [meals, setMeals] = useState<Meal[]>([]);
   const [showSettings, setShowSettings] = useState(false);
+  
+  // Cele i profil
   const [goal, setGoal] = useState({ kcal: 2500, protein: 160, carbs: 250, fat: 80 });
-  const [profile, setProfile] = useState({ age: '', weight: '', height: '', activity: 'Siedzący tryb życia', target: 'Redukcja (Deficyt kaloryczny)' });
+  const [profile, setProfile] = useState({ 
+    age: '', 
+    weight: '', 
+    height: '', 
+    activity: 'Siedzący tryb życia', 
+    target: 'Redukcja (Deficyt kaloryczny)' 
+  });
 
   useEffect(() => {
     fetchMeals();
@@ -97,14 +105,34 @@ export default function Home() {
 
   const calculateLocalGoals = (e: React.FormEvent) => {
     e.preventDefault();
-    const w = parseFloat(profile.weight); const h = parseFloat(profile.height); const a = parseInt(profile.age);
+    const w = parseFloat(profile.weight); 
+    const h = parseFloat(profile.height); 
+    const a = parseInt(profile.age);
+    
+    if (!w || !h || !a) {
+      alert("Proszę wypełnić wszystkie pola!");
+      return;
+    }
+
     let bmr = (10 * w) + (6.25 * h) - (5 * a) + 5;
     let mult = profile.activity.includes('Lekka') ? 1.375 : profile.activity.includes('Średnia') ? 1.55 : profile.activity.includes('wysoka') ? 1.725 : 1.2;
     let tdee = bmr * mult;
     let finalKcal = profile.target.includes('Redukcja') ? tdee - 400 : profile.target.includes('Budowa') ? tdee + 300 : tdee;
-    const p = w * 2.0; const f = w * 1.0; const c = (finalKcal - (p * 4) - (f * 9)) / 4;
-    const newGoals = { kcal: Math.round(finalKcal), protein: Math.round(p), fat: Math.round(f), carbs: Math.round(c) };
-    setGoal(newGoals); localStorage.setItem('fatatu_goal', JSON.stringify(newGoals)); localStorage.setItem('fatatu_profile', JSON.stringify(profile));
+    
+    const p = w * 2.0; 
+    const f = w * 1.0; 
+    const c = (finalKcal - (p * 4) - (f * 9)) / 4;
+
+    const newGoals = { 
+      kcal: Math.round(finalKcal), 
+      protein: Math.round(p), 
+      fat: Math.round(f), 
+      carbs: Math.round(c) 
+    };
+
+    setGoal(newGoals); 
+    localStorage.setItem('fatatu_goal', JSON.stringify(newGoals)); 
+    localStorage.setItem('fatatu_profile', JSON.stringify(profile));
     setShowSettings(false);
   };
 
@@ -112,7 +140,7 @@ export default function Home() {
   const filteredRecipes = filter === 'ALL' ? RECIPES : RECIPES.filter(r => r.tag === filter);
 
   return (
-    <main className="min-h-screen bg-[#f8fafc] p-4 md:p-8 text-slate-900 pb-24">
+    <main className="min-h-screen bg-[#f8fafc] p-4 md:p-8 text-slate-900 pb-24 font-sans">
       <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
         
         <header className="flex flex-col items-center relative mt-4 md:mt-0">
@@ -121,19 +149,22 @@ export default function Home() {
             <button onClick={() => {setTab('journal'); setSelectedRecipe(null);}} className={`px-4 md:px-8 py-2 md:py-2.5 rounded-xl font-black text-sm md:text-base transition-all ${tab === 'journal' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-indigo-500'}`}>DZIENNIK</button>
             <button onClick={() => setTab('recipes')} className={`px-4 md:px-8 py-2 md:py-2.5 rounded-xl font-black text-sm md:text-base transition-all ${tab === 'recipes' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-indigo-500'}`}>PRZEPISY ⚡</button>
           </nav>
-          <button onClick={() => setShowSettings(!showSettings)} className="absolute right-0 top-0 md:top-2 font-bold text-[10px] md:text-xs bg-white text-slate-400 px-3 py-1.5 rounded-full border border-slate-100 shadow-sm">⚙️ PROFIL</button>
+          <button onClick={() => setShowSettings(!showSettings)} className="absolute right-0 top-0 md:top-2 font-bold text-[10px] md:text-xs bg-white text-slate-400 px-3 py-1.5 rounded-full border border-slate-100 shadow-sm hover:text-indigo-600">⚙️ PROFIL</button>
         </header>
 
         {showSettings && (
-          <form onSubmit={calculateLocalGoals} className="bg-white p-6 rounded-[2rem] shadow-2xl border-2 border-indigo-100 grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="col-span-1 md:col-span-5"><h3 className="font-black uppercase text-xs text-indigo-400">Twoje dane</h3></div>
-            <input type="number" placeholder="Wiek" value={profile.age} onChange={e => setProfile({...profile, age: e.target.value})} className="bg-slate-50 p-3 rounded-xl border border-slate-100 focus:border-indigo-500 outline-none" />
-            <input type="number" placeholder="Waga kg" value={profile.weight} onChange={e => setProfile({...profile, weight: e.target.value})} className="bg-slate-50 p-3 rounded-xl border border-slate-100 focus:border-indigo-500 outline-none" />
-            <input type="number" placeholder="Wzrost cm" value={profile.height} onChange={e => setProfile({...profile, height: e.target.value})} className="bg-slate-50 p-3 rounded-xl border border-slate-100 focus:border-indigo-500 outline-none" />
-            <select value={profile.activity} onChange={e => setProfile({...profile, activity: e.target.value})} className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs col-span-1 md:col-span-2">
+          <form onSubmit={calculateLocalGoals} className="bg-white p-6 rounded-[2rem] shadow-2xl border-2 border-indigo-100 grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-top-4">
+            <div className="col-span-1 md:col-span-2 flex justify-between items-center"><h3 className="font-black uppercase text-xs text-indigo-400">Twoje dane i cele</h3><button type="button" onClick={() => setShowSettings(false)} className="text-slate-300 font-bold">✕</button></div>
+            <input type="number" placeholder="Wiek" value={profile.age} onChange={e => setProfile({...profile, age: e.target.value})} className="bg-slate-50 p-4 rounded-xl border border-slate-100 focus:border-indigo-500 outline-none w-full" />
+            <input type="number" placeholder="Waga (kg)" value={profile.weight} onChange={e => setProfile({...profile, weight: e.target.value})} className="bg-slate-50 p-4 rounded-xl border border-slate-100 focus:border-indigo-500 outline-none w-full" />
+            <input type="number" placeholder="Wzrost (cm)" value={profile.height} onChange={e => setProfile({...profile, height: e.target.value})} className="bg-slate-50 p-4 rounded-xl border border-slate-100 focus:border-indigo-500 outline-none w-full" />
+            <select value={profile.activity} onChange={e => setProfile({...profile, activity: e.target.value})} className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm">
               <option>Siedzący tryb życia</option><option>Lekka (1-3 treningi)</option><option>Średnia (3-5 treningów)</option><option>Bardzo wysoka</option>
             </select>
-            <button type="submit" className="col-span-1 md:col-span-5 bg-indigo-600 text-white font-black py-4 rounded-xl">ZAPISZ I OBLICZ 🚀</button>
+            <select value={profile.target} onChange={e => setProfile({...profile, target: e.target.value})} className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm col-span-1 md:col-span-2">
+              <option>Redukcja (Deficyt kaloryczny)</option><option>Utrzymanie wagi</option><option>Budowa masy mięśniowej</option>
+            </select>
+            <button type="submit" className="col-span-1 md:col-span-2 bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-indigo-700 transition-all">ZAPISZ I OBLICZ 🚀</button>
           </form>
         )}
 
@@ -146,20 +177,20 @@ export default function Home() {
               <StatCard title="Tłuszcze" cur={current.f} max={goal.fat} unit="g" col="bg-emerald-500" />
             </div>
             <form onSubmit={handleAddFood} className="bg-white p-2 rounded-3xl shadow-xl border border-indigo-50 flex flex-col md:flex-row gap-2">
-              <input type="text" value={foodInput} onChange={(e) => setFoodInput(e.target.value)} placeholder="Co zjadłeś?" className="flex-1 px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-transparent focus:outline-none" disabled={isLoading} />
-              <button disabled={isLoading} className="px-6 md:px-10 py-3 md:py-4 bg-indigo-600 text-white rounded-2xl font-black">{isLoading ? 'ANALIZA...' : 'DODAJ'}</button>
+              <input type="text" value={foodInput} onChange={(e) => setFoodInput(e.target.value)} placeholder="Co zjadłeś? (np. 2 jajka, pizza, banan)" className="flex-1 px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-transparent focus:outline-none" disabled={isLoading} />
+              <button disabled={isLoading} className="px-6 md:px-10 py-3 md:py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition-all">{isLoading ? 'ANALIZA...' : 'DODAJ'}</button>
             </form>
             <div className="space-y-4">
-              <h2 className="text-xl md:text-2xl font-black text-slate-800">Historia dnia</h2>
+              <h2 className="text-xl md:text-2xl font-black text-slate-800">Dzisiejsze posiłki</h2>
+              {meals.length === 0 && !isLoading && <div className="text-center py-10 text-slate-300 font-bold italic">Brak posiłków. Czas coś zjeść! 🥗</div>}
               {meals.map(m => (
-                <div key={m.id} className="relative bg-white p-5 md:p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 overflow-hidden">
+                <div key={m.id} className="relative bg-white p-5 md:p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 overflow-hidden animate-in fade-in">
                   <div className="w-full pr-12 md:pr-0">
                     <div className="font-black text-lg md:text-xl capitalize text-slate-800 leading-tight">{m.name}</div>
                     <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs md:text-sm font-bold mt-2">
                       <span className="text-indigo-500">{m.kcal} kcal</span><span className="text-rose-400">B: {m.protein}g</span><span className="text-amber-400">W: {m.carbs}g</span><span className="text-emerald-400">T: {m.fat}g</span>
                     </div>
                   </div>
-                  {/* PRZYCISK X - NAPRAWIONY NA DOTYK */}
                   <button 
                     onPointerDown={async (e) => {
                       e.stopPropagation();
@@ -179,24 +210,24 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+          <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500 pb-10">
             {!selectedRecipe ? (
               <>
-                <div className="flex gap-2 overflow-x-auto pb-4 mb-2 scrollbar-hide">
-                  <button onClick={() => setFilter('ALL')} className={`px-4 py-2 rounded-full font-black text-[10px] md:text-xs transition-all whitespace-nowrap ${filter === 'ALL' ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-400 border border-slate-100'}`}>Wszystkie</button>
-                  <button onClick={() => setFilter('REDUKCJA')} className={`px-4 py-2 rounded-full font-black text-[10px] md:text-xs transition-all whitespace-nowrap ${filter === 'REDUKCJA' ? 'bg-rose-100 text-rose-600 border border-rose-200' : 'bg-white text-slate-400 border border-slate-100'}`}>🔥 Redukcja</button>
-                  <button onClick={() => setFilter('MASA')} className={`px-4 py-2 rounded-full font-black text-[10px] md:text-xs transition-all whitespace-nowrap ${filter === 'MASA' ? 'bg-indigo-100 text-indigo-600 border border-indigo-200' : 'bg-white text-slate-400 border border-slate-100'}`}>💪 Masa</button>
-                  <button onClick={() => setFilter('UTRZYMANIE')} className={`px-4 py-2 rounded-full font-black text-[10px] md:text-xs transition-all whitespace-nowrap ${filter === 'UTRZYMANIE' ? 'bg-emerald-100 text-emerald-600 border border-emerald-200' : 'bg-white text-slate-400 border border-slate-100'}`}>⚖️ Utrzymanie</button>
+                <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
+                  <button onClick={() => setFilter('ALL')} className={`px-5 py-2.5 rounded-full font-black text-xs transition-all whitespace-nowrap ${filter === 'ALL' ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-400 border border-slate-100'}`}>Wszystkie</button>
+                  <button onClick={() => setFilter('REDUKCJA')} className={`px-5 py-2.5 rounded-full font-black text-xs transition-all whitespace-nowrap ${filter === 'REDUKCJA' ? 'bg-rose-100 text-rose-600 border border-rose-200' : 'bg-white text-slate-400 border border-slate-100'}`}>🔥 Redukcja</button>
+                  <button onClick={() => setFilter('MASA')} className={`px-5 py-2.5 rounded-full font-black text-xs transition-all whitespace-nowrap ${filter === 'MASA' ? 'bg-indigo-100 text-indigo-600 border border-indigo-200' : 'bg-white text-slate-400 border border-slate-100'}`}>💪 Masa</button>
+                  <button onClick={() => setFilter('UTRZYMANIE')} className={`px-5 py-2.5 rounded-full font-black text-xs transition-all whitespace-nowrap ${filter === 'UTRZYMANIE' ? 'bg-emerald-100 text-emerald-600 border border-emerald-200' : 'bg-white text-slate-400 border border-slate-100'}`}>⚖️ Utrzymanie</button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 pb-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   {filteredRecipes.map((r, i) => (
-                    <div key={i} onClick={() => setSelectedRecipe(r)} className="bg-white rounded-[2rem] p-6 md:p-8 space-y-4 border border-slate-100 shadow-sm cursor-pointer hover:shadow-xl transition-all">
+                    <div key={i} onClick={() => setSelectedRecipe(r)} className="bg-white rounded-[2rem] p-6 md:p-8 space-y-4 border border-slate-100 shadow-sm cursor-pointer hover:shadow-xl hover:scale-[1.01] transition-all">
                       <div className="flex justify-between items-center">
-                        <span className={`px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase ${r.tag === 'REDUKCJA' ? 'bg-rose-100 text-rose-600' : r.tag === 'MASA' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600'}`}>{r.tag}</span>
-                        <span className="text-slate-300 font-bold text-[10px] md:text-xs uppercase">{r.time}</span>
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${r.tag === 'REDUKCJA' ? 'bg-rose-100 text-rose-600' : r.tag === 'MASA' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600'}`}>{r.tag}</span>
+                        <span className="text-slate-300 font-bold text-xs uppercase tracking-widest">{r.time}</span>
                       </div>
-                      <h3 className="text-xl md:text-2xl font-black text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors">{r.title}</h3>
-                      <div className="flex flex-wrap gap-2 text-[10px] md:text-[11px] font-bold">
+                      <h3 className="text-xl md:text-2xl font-black text-slate-800 leading-tight">{r.title}</h3>
+                      <div className="flex flex-wrap gap-2 text-[11px] font-bold">
                         <span className="bg-slate-50 px-3 py-1 rounded-lg text-slate-500">{r.kcal} kcal</span><span className="bg-rose-50 px-3 py-1 rounded-lg text-rose-500">B: {r.p}g</span>
                       </div>
                     </div>
@@ -204,29 +235,29 @@ export default function Home() {
                 </div>
               </>
             ) : (
-              <div className="bg-white rounded-[2rem] md:rounded-[3rem] shadow-2xl border border-indigo-50 overflow-hidden animate-in zoom-in-95 duration-300">
-                <div className="p-6 md:p-12 space-y-6 md:space-y-8">
-                  <button onClick={() => setSelectedRecipe(null)} className="text-indigo-600 font-black flex items-center gap-2 uppercase text-xs md:text-sm">← Powrót</button>
+              <div className="bg-white rounded-[2rem] md:rounded-[3rem] shadow-2xl border border-indigo-50 overflow-hidden animate-in zoom-in-95">
+                <div className="p-6 md:p-12 space-y-8">
+                  <button onClick={() => setSelectedRecipe(null)} className="text-indigo-600 font-black flex items-center gap-2 uppercase text-xs md:text-sm hover:translate-x-[-4px] transition-all">← Powrót do listy</button>
                   <div className="space-y-4">
                     <h2 className="text-3xl md:text-5xl font-black text-slate-800 italic tracking-tighter leading-tight">{selectedRecipe.title}</h2>
-                    <div className="grid grid-cols-2 md:flex md:gap-6 gap-4 py-4 border-y border-slate-50">
-                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-indigo-600">{selectedRecipe.kcal}</div><div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest font-black">kcal</div></div>
-                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-rose-500">{selectedRecipe.p}g</div><div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest font-black">Białko</div></div>
-                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-amber-500">{selectedRecipe.c}g</div><div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest font-black">Węgle</div></div>
-                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-emerald-500">{selectedRecipe.f}g</div><div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest font-black">Tłuszcz</div></div>
+                    <div className="grid grid-cols-2 md:flex md:gap-6 gap-4 py-6 border-y border-slate-50">
+                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-indigo-600">{selectedRecipe.kcal}</div><div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-black">kcal</div></div>
+                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-rose-500">{selectedRecipe.p}g</div><div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-black">Białko</div></div>
+                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-amber-500">{selectedRecipe.c}g</div><div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-black">Węgle</div></div>
+                      <div className="text-left md:text-center"><div className="text-xl md:text-2xl font-black text-emerald-500">{selectedRecipe.f}g</div><div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-black">Tłuszcz</div></div>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-4"><h3 className="text-lg font-black uppercase">🛒 Składniki</h3>
-                      <ul className="space-y-2">{selectedRecipe.ingredients.map((ing, i) => (<li key={i} className="font-bold text-slate-600 bg-slate-50 p-3 rounded-xl text-sm">• {ing}</li>))}</ul>
+                    <div className="space-y-4"><h3 className="text-lg font-black uppercase text-slate-800">🛒 Składniki</h3>
+                      <ul className="space-y-2">{selectedRecipe.ingredients.map((ing, i) => (<li key={i} className="font-bold text-slate-600 bg-slate-50 p-3 rounded-xl text-sm flex items-center gap-2"><span className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></span>{ing}</li>))}</ul>
                     </div>
-                    <div className="space-y-4"><h3 className="text-lg font-black uppercase">👨‍🍳 Tutorial</h3>
-                      <ol className="space-y-4">{selectedRecipe.steps.map((step, i) => (<li key={i} className="flex gap-3"><span className="flex-shrink-0 w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center font-black text-[10px]">{i+1}</span><p className="text-slate-600 text-sm">{step}</p></li>))}</ol>
+                    <div className="space-y-4"><h3 className="text-lg font-black uppercase text-slate-800">👨‍🍳 Tutorial</h3>
+                      <ol className="space-y-4">{selectedRecipe.steps.map((step, i) => (<li key={i} className="flex gap-3"><span className="flex-shrink-0 w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center font-black text-[10px]">{i+1}</span><p className="text-slate-600 text-sm leading-relaxed">{step}</p></li>))}</ol>
                     </div>
                   </div>
                   <button 
                     onClick={() => { handleAddFood(undefined, selectedRecipe); setTab('journal'); setSelectedRecipe(null); }}
-                    className="w-full py-4 md:py-6 bg-indigo-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-indigo-100 hover:scale-[1.02] transition-all"
+                    className="w-full py-5 md:py-7 bg-indigo-600 text-white rounded-[2rem] font-black text-xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all"
                   >
                     DODAJ DO DZIENNIKA ✨
                   </button>
@@ -244,9 +275,9 @@ function StatCard({ title, cur, max, unit, col }: any) {
   const prc = Math.min((cur / max) * 100, 100);
   return (
     <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-between">
-      <div className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1">{title}</div>
+      <div className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-wider">{title}</div>
       <div className="flex items-baseline gap-1 break-all"><span className="text-2xl md:text-3xl font-black text-slate-800">{cur}</span><span className="text-[10px] md:text-xs font-bold text-slate-400">{unit}</span></div>
-      <div><div className="w-full bg-slate-100 h-2 md:h-2.5 rounded-full mt-3 overflow-hidden"><div className={`h-full ${col} transition-all duration-1000`} style={{ width: `${prc}%` }} /></div><div className="text-[9px] md:text-[10px] font-bold text-slate-300 mt-2 text-right">CEL: {max}</div></div>
+      <div><div className="w-full bg-slate-100 h-2.5 rounded-full mt-3 overflow-hidden"><div className={`h-full ${col} transition-all duration-1000`} style={{ width: `${prc}%` }} /></div><div className="text-[10px] font-bold text-slate-300 mt-2 text-right">CEL: {max}</div></div>
     </div>
   );
 }
