@@ -267,25 +267,39 @@ export default function Home() {
               <button disabled={isLoading} className="px-6 md:px-10 py-3 md:py-4 bg-indigo-600 text-white rounded-2xl font-black">{isLoading ? 'ANALIZA...' : 'DODAJ'}</button>
             </form>
             <div className="space-y-4">
-              <h2 className="text-xl md:text-2xl font-black text-slate-800">Historia dnia</h2>
-              {meals.map(m => (
-                <div key={m.id} className="relative bg-white p-5 md:p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div className="w-full pr-12 md:pr-0">
-                    <div className="font-black text-lg md:text-xl capitalize text-slate-800 leading-tight">{m.name}</div>
-                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs md:text-sm font-bold mt-2">
-                      <span className="text-indigo-500">{m.kcal} kcal</span><span className="text-rose-400">B: {m.protein}g</span><span className="text-amber-400">W: {m.carbs}g</span><span className="text-emerald-400">T: {m.fat}g</span>
-                    </div>
-                  </div>
-                  {/* 🔥 NAPRAWIONY PRZYCISK X */}
-                  <button 
-                    onClick={async () => { await supabase.from('meals').delete().eq('id', m.id); fetchMeals(); }} 
-                    className="absolute top-2 right-2 md:static z-10 w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-300 hover:text-rose-500 active:bg-rose-50 transition-all cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
+  <h2 className="text-xl md:text-2xl font-black text-slate-800">Historia dnia</h2>
+  {meals.map(m => (
+    <div key={m.id} className="relative bg-white p-5 md:p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 overflow-hidden">
+      <div className="w-full pr-12 md:pr-0">
+        <div className="font-black text-lg md:text-xl capitalize text-slate-800 leading-tight">{m.name}</div>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs md:text-sm font-bold mt-2">
+          <span className="text-indigo-500">{m.kcal} kcal</span>
+          <span className="text-rose-400">B: {m.protein}g</span>
+          <span className="text-amber-400">W: {m.carbs}g</span>
+          <span className="text-emerald-400">T: {m.fat}g</span>
+        </div>
+      </div>
+      
+      {/* 🛠️ NOWY, NIEZNISZCZALNY PRZYCISK X */}
+      <button 
+        onPointerDown={async (e) => {
+          e.stopPropagation();
+          const confirmDelete = window.confirm("Usunąć ten posiłek?");
+          if (confirmDelete) {
+            await supabase.from('meals').delete().eq('id', m.id);
+            fetchMeals();
+          }
+        }}
+        className="absolute top-0 right-0 z-[9999] w-14 h-14 flex items-center justify-center text-slate-300 hover:text-rose-500 active:text-rose-600 transition-all touch-none"
+        aria-label="Usuń posiłek"
+      >
+        <span className="bg-slate-50 w-8 h-8 flex items-center justify-center rounded-xl pointer-events-none font-bold">
+          ✕
+        </span>
+      </button>
+    </div>
+  ))}
+</div>
           </div>
         ) : (
           <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
