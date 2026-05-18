@@ -1,0 +1,1 @@
+Inteligentny kalkulator kalorii i dziennik żywieniowy zbudowany w Next.js 14. Aplikacja wykorzystuje model Google Gemini AI do błyskawicznej analizy posiłków z języka naturalnego oraz Supabase jako bazę danych w czasie rzeczywistym. Posiada wbudowaną bazę 24 przepisów z tutorialami, system obliczania zapotrzebowania (BMR/TDEE) oraz pełną responsywność (PWA).
